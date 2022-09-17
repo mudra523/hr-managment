@@ -8,7 +8,6 @@ import {
   Typography,
   Form,
   Input,
-  Checkbox,
   DatePicker,
   InputNumber,
   Select,
@@ -20,26 +19,16 @@ import { getRequest } from "../../api";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../components/Auth";
 import { postRequest } from "../../api";
-import { useSelector } from "react-redux";
-import { selectAuthToken } from "../../features/authTokenSlice";
-
-const { Meta } = Card;
+import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
 const { Title } = Typography;
 const { Option } = Select;
 
-function getBase64(img, callback) {
-  const reader = new FileReader();
-  reader.addEventListener("load", () => callback(reader.result));
-  reader.readAsDataURL(img);
-}
 
 function Dashboard() {
   const navigate = useNavigate();
   const location = useLocation();
   const auth = useAuth();
-  const [fileList, setFileList] = useState(null);
   const [categories, setCategories] = useState([]);
-  const [editForm, setEditForm] = useState({});
 
   const user = localStorage.getItem("user")
     ? JSON.parse(localStorage.getItem("user"))
@@ -141,7 +130,45 @@ function Dashboard() {
       onFilter: (value, record) => record.address.startsWith(value),
       filterSearch: true,
     },
-  ];
+    {
+      title: "City",
+      dataIndex: "city",
+      filters: [
+        {
+          text: "London",
+          value: "London",
+        },
+        {
+          text: "New York",
+          value: "New York",
+        },
+      ],
+      onFilter: (value, record) => record.address.startsWith(value),
+      filterSearch: true,
+    },
+    {
+      title: 'action',
+      dataIndex: 'Action',
+      render: (_, record) => {
+        return  (
+          <span>
+            <Typography.Link
+              onClick={showModal}
+              style={{
+                marginRight: 8,
+              }}
+            >
+              <EditOutlined />
+            </Typography.Link>
+            <Typography.Link
+            >
+              <DeleteOutlined />
+            </Typography.Link>
+          </span>
+        );
+      },
+    }
+    ];
   const data = [
     {
       key: "1",
