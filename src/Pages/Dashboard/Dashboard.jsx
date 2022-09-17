@@ -1,6 +1,5 @@
 import {
   Table,
-  Card,
   Col,
   Button,
   Modal,
@@ -19,10 +18,10 @@ import { getRequest } from "../../api";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../components/Auth";
 import { postRequest } from "../../api";
-import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { EditOutlined, DeleteOutlined, SearchOutlined} from "@ant-design/icons";
 const { Title } = Typography;
 const { Option } = Select;
-
+const { Search } = Input;
 
 function Dashboard() {
   const navigate = useNavigate();
@@ -147,10 +146,10 @@ function Dashboard() {
       filterSearch: true,
     },
     {
-      title: 'action',
-      dataIndex: 'Action',
+      title: "Action",
+      dataIndex: "action",
       render: (_, record) => {
-        return  (
+        return (
           <span>
             <Typography.Link
               onClick={showModal}
@@ -160,15 +159,14 @@ function Dashboard() {
             >
               <EditOutlined />
             </Typography.Link>
-            <Typography.Link
-            >
+            <Typography.Link>
               <DeleteOutlined />
             </Typography.Link>
           </span>
         );
       },
-    }
-    ];
+    },
+  ];
   const data = [
     {
       key: "1",
@@ -249,15 +247,32 @@ function Dashboard() {
   const handleChange = (value) => {
     console.log(`selected ${value}`);
   };
+  const onSearch = (value) => console.log(value);
 
   return (
     <>
       <Layout>
         <Row style={{ marginTop: "2em" }} justify="center">
           <Col xs={24} sm={24} md={22} lg={20} xl={20}>
-            <Row style={{ marginBottom: "2em" }} justify="space-between">
+            <Row
+              style={{ marginBottom: "2em" }}
+              justify="space-between"
+              align="center"
+            >
               <Col>
                 <Title level={2}>Candidate Data</Title>
+              </Col>
+              <Col style={{ display: "flex", alignItems: "center" }}>
+                <Input
+                  size="large"
+                  className="inputfield"
+                  style={{ width: 400, padding: "10px" }}
+                  placeholder="Serch Candidate..."
+                  onSearch={onSearch}
+                  suffix={
+                    <SearchOutlined />
+                  }
+                />
               </Col>
               <Col>
                 <Button className="button" onClick={showModal}>
