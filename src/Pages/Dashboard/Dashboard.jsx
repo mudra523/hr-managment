@@ -1,12 +1,4 @@
-import {
-  Table,
-  Card,
-  Col,
-  Button,
-  Modal,
-  Row,
-  Typography
-} from "antd";
+import { Table, Card, Col, Button, Modal, Row, Typography } from "antd";
 import React, { useEffect, useState } from "react";
 import Layout from "../../Layouts/index";
 import { getRequest } from "../../api";
@@ -160,37 +152,53 @@ function Dashboard() {
   const onChange = (pagination, filters, sorter, extra) => {
     console.log("params", pagination, filters, sorter, extra);
   };
-  const [open, setOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const showModal = () => {
+    console.log("modal");
+    setIsModalOpen(true);
+  };
+
+  const handleOk = () => {
+    console.log("ok");
+    setIsModalOpen(false);
+  };
+
+  const handleCancel = () => {
+    console.log("cancel");
+    setIsModalOpen(false);
+  };
 
   return (
-    <Layout>
-      <Row style={{ marginTop: "2em" }} justify="center">
-        <Col xs={24} sm={24} md={22} lg={20} xl={20}>
-          <Row style={{ marginBottom: "2em" }} justify="space-between">
-            <Col>Candidate Data</Col>
-            <Col>
-            <Button className="button" onClick={() => setOpen(true)}>
-                Add Data
-              </Button>
-            </Col>
-          </Row>
-          <Table columns={columns} dataSource={data} onChange={onChange} />
-
-          <Modal
-        title="Modal 1000px width"
-        centered
-        open={open}
-        onOk={() => setOpen(false)}
-        onCancel={() => setOpen(false)}
-        width={1000}
+    <>
+      <Layout>
+        <Row style={{ marginTop: "2em" }} justify="center">
+          <Col xs={24} sm={24} md={22} lg={20} xl={20}>
+            <Row style={{ marginBottom: "2em" }} justify="space-between">
+              <Col>
+                <Title level={2}>Candidate Data</Title>
+              </Col>
+              <Col>
+                <Button className="button" onClick={showModal}>
+                  Add Data
+                </Button>
+              </Col>
+            </Row>
+            <Table columns={columns} dataSource={data} onChange={onChange} />
+          </Col>
+        </Row>
+      </Layout>
+      <Modal
+        title="Basic Modal"
+        open={isModalOpen}
+        onOk={handleOk}
+        onCancel={handleCancel}
       >
-        <p>some contents...</p>
-        <p>some contents...</p>
-        <p>some contents...</p>
+        <p>Some contents...</p>
+        <p>Some contents...</p>
+        <p>Some contents...</p>
       </Modal>
-        </Col>
-      </Row>
-    </Layout>
+    </>
   );
 }
 
