@@ -19,10 +19,9 @@ import { getRequest } from "../../api";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../components/Auth";
 import { postRequest } from "../../api";
-import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
 const { Title } = Typography;
 const { Option } = Select;
-
 
 function Dashboard() {
   const navigate = useNavigate();
@@ -147,10 +146,10 @@ function Dashboard() {
       filterSearch: true,
     },
     {
-      title: 'action',
-      dataIndex: 'Action',
+      title: "action",
+      dataIndex: "Action",
       render: (_, record) => {
-        return  (
+        return (
           <span>
             <Typography.Link
               onClick={showModal}
@@ -160,15 +159,14 @@ function Dashboard() {
             >
               <EditOutlined />
             </Typography.Link>
-            <Typography.Link
-            >
+            <Typography.Link>
               <DeleteOutlined />
             </Typography.Link>
           </span>
         );
       },
-    }
-    ];
+    },
+  ];
   const data = [
     {
       key: "1",
