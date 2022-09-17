@@ -1,14 +1,31 @@
-import { Table, Card, Col, Button, Modal, Row, Typography } from "antd";
+import {
+  Table,
+  Card,
+  Col,
+  Button,
+  Modal,
+  Row,
+  Typography,
+  Form,
+  Input,
+  Checkbox,
+  DatePicker,
+  InputNumber,
+  Select,
+  Upload,
+} from "antd";
 import React, { useEffect, useState } from "react";
 import Layout from "../../Layouts/index";
 import { getRequest } from "../../api";
-import { useNavigate } from "react-router-dom";
-import { UploadOutlined } from "@ant-design/icons";
+import { Link, useNavigate, useLocation } from "react-router-dom";
+import { useAuth } from "../../components/Auth";
+import { postRequest } from "../../api";
 import { useSelector } from "react-redux";
 import { selectAuthToken } from "../../features/authTokenSlice";
 
 const { Meta } = Card;
 const { Title } = Typography;
+const { Option } = Select;
 
 function getBase64(img, callback) {
   const reader = new FileReader();
@@ -18,6 +35,8 @@ function getBase64(img, callback) {
 
 function Dashboard() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const auth = useAuth();
   const [fileList, setFileList] = useState(null);
   const [categories, setCategories] = useState([]);
   const [editForm, setEditForm] = useState({});
@@ -152,37 +171,257 @@ function Dashboard() {
   const onChange = (pagination, filters, sorter, extra) => {
     console.log("params", pagination, filters, sorter, extra);
   };
-  const [open, setOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const showModal = () => {
+    console.log("modal");
+    setIsModalOpen(true);
+  };
+
+  const handleOk = () => {
+    console.log("ok");
+    setIsModalOpen(false);
+  };
+
+  const handleCancel = () => {
+    console.log("cancel");
+    setIsModalOpen(false);
+  };
+
+  const redirectPath = location.state?.path || "/dashboard";
+  const onFinish = async (values) => {
+    await postRequest("register", values).then(({ data }) => {
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify(data.user));
+      auth.login(data.token);
+      navigate(redirectPath, { replace: true });
+    });
+  };
+
+  const onFinishFailed = (errorInfo) => {
+    console.log("Failed:", errorInfo);
+  };
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      navigate("/dashboard");
+    }
+  }, []);
+
+  const validateMessages = {
+    required: "${label} is required!",
+    types: {
+      email: "${label} is not a valid email!",
+      number: "${label} is not a valid number!",
+    },
+    number: {
+      range: "${label} must be between ${min} and ${max}",
+    },
+  };
+  const handleChange = (value) => {
+    console.log(`selected ${value}`);
+  };
 
   return (
-    <Layout>
-      <Row style={{ marginTop: "2em" }} justify="center">
-        <Col xs={24} sm={24} md={22} lg={20} xl={20}>
-          <Row style={{ marginBottom: "2em" }} justify="space-between">
-            <Col>Candidate Data</Col>
-            <Col>
-              <Button className="button" onClick={() => setOpen(true)}>
-                Add Data
-              </Button>
+    <>
+      <Layout>
+        <Row style={{ marginTop: "2em" }} justify="center">
+          <Col xs={24} sm={24} md={22} lg={20} xl={20}>
+            <Row style={{ marginBottom: "2em" }} justify="space-between">
+              <Col>
+                <Title level={2}>Candidate Data</Title>
+              </Col>
+              <Col>
+                <Button className="button" onClick={showModal}>
+                  Add Data
+                </Button>
+              </Col>
+            </Row>
+            <Table columns={columns} dataSource={data} onChange={onChange} />
+          </Col>
+        </Row>
+      </Layout>
+      <Modal
+        title="Basic Modal"
+        visible={isModalOpen}
+        onOk={handleOk}
+        onCancel={handleCancel}
+        footer={null}
+      >
+        <Form
+          name="basic"
+          initialValues={{ remember: true }}
+          onFinish={onFinish}
+          onFinishFailed={onFinishFailed}
+          autoComplete="off"
+          className="cd_form"
+          validateMessages={validateMessages}
+        >
+          <Row
+            gutter={{
+              xs: 8,
+              sm: 16,
+              md: 24,
+              lg: 32,
+            }}
+          >
+            <Col xs={24} sm={24} md={12} lg={12} xl={12}>
+              <Form.Item
+                name="fullname"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please enter fullname!",
+                  },
+                ]}
+              >
+                <Input
+                  className="inputfield"
+                  style={{ padding: "10px" }}
+                  placeholder="Enter Fullname"
+                />
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={24} md={12} lg={12} xl={12}>
+              <Form.Item
+                name="Date Of Birth"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please enter Date of Birth!",
+                  },
+                ]}
+              >
+                <DatePicker
+                  className="inputfield"
+                  style={{ padding: "10px", width: "100%" }}
+                />
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={24} md={24} lg={24} xl={24}>
+              <Form.Item
+                name="technology"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please enter Technology!",
+                  },
+                ]}
+              >
+                <Select
+                  mode="tags"
+                  style={{
+                    width: "100%",
+                  }}
+                  placeholder="Enter Technology"
+                  onChange={handleChange}
+                >
+                  <Option key="1">Node JS</Option>
+                  <Option key="2">Nest JS</Option>
+                  <Option key="3">React</Option>
+                  <Option key="4">AWS</Option>
+                </Select>
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={24} md={12} lg={12} xl={12}>
+              <Form.Item
+                name="position"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please select relevant position!",
+                  },
+                ]}
+              >
+                <Select placeholder="Select Relevant Position">
+                  <Select.Option value="demo">Demo</Select.Option>
+                  <Select.Option value="demo">Demo</Select.Option>
+                  <Select.Option value="demo">Demo</Select.Option>
+                </Select>
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={24} md={12} lg={12} xl={12}>
+              <Form.Item
+                name="experience"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please enter Year Of Experience!",
+                  },
+                ]}
+              >
+                <InputNumber
+                  placeholder="Year Of Experience"
+                  className="inputfield"
+                  style={{ padding: "6px", width: "100%" }}
+                />
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={24} md={12} lg={12} xl={12}>
+              <Form.Item
+                name="ctc"
+                rules={[{ required: true, message: "Please enter CTC!" }]}
+              >
+                <Input
+                  className="inputfield"
+                  style={{ padding: "10px" }}
+                  placeholder="Enter CTC"
+                />
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={24} md={12} lg={12} xl={12}>
+              <Form.Item
+                name="ectc"
+                rules={[
+                  { required: true, message: "Please enter Expected CTC!" },
+                ]}
+              >
+                <Input
+                  className="inputfield"
+                  style={{ padding: "10px" }}
+                  placeholder="Enter Expected CTC"
+                />
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={24} md={12} lg={12} xl={12}>
+              <Form.Item
+                name="city"
+                rules={[
+                  { required: true, message: "Please enter Current City!" },
+                ]}
+              >
+                <Input
+                  className="inputfield"
+                  style={{ padding: "10px" }}
+                  placeholder="Enter Current City"
+                />
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={24} md={12} lg={12} xl={12}>
+              <Form.Item
+                name="upload"
+                rules={[{ required: true, message: "Please Upload CV!" }]}
+              >
+                <Upload
+                  name="logo"
+                  action="/upload.do"
+                  listType="picture"
+                  style={{ padding: "10px", width: "100%" }}
+                >
+                  <Button>Upload CV</Button>
+                </Upload>
+              </Form.Item>
             </Col>
           </Row>
-          <Table columns={columns} dataSource={data} onChange={onChange} />
-
-          <Modal
-            title="Modal 1000px width"
-            centered
-            open={open}
-            onOk={() => setOpen(false)}
-            onCancel={() => setOpen(false)}
-            width={1000}
-          >
-            <p>some contents...</p>
-            <p>some contents...</p>
-            <p>some contents...</p>
-          </Modal>
-        </Col>
-      </Row>
-    </Layout>
+          <Form.Item>
+            <Button className="button" htmlType="submit">
+              Submit
+            </Button>
+          </Form.Item>
+        </Form>
+      </Modal>
+    </>
   );
 }
 
