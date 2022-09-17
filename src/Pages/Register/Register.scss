@@ -1,0 +1,24 @@
+.reg_layout {
+  height: 80vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.reg_form {
+  display: "flex";
+  justify-content: "center";
+  flex-direction: "column";
+  margin-top: "35px";
+}
+
+.reg_box {
+  padding: 2em;
+  background-color: #fff;
+}
+
+.reg_header {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}

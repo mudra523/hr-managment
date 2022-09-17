@@ -1,0 +1,247 @@
+$mainColor: #6534da;
+$mainSubColor: #9c82dd;
+$borderColor: #ced4da;
+
+.button {
+  background-color: $mainColor;
+  color: white;
+  border: 2px solid $mainColor;
+  border-radius: 50px;
+  font-size: 15px;
+  height: 45px;
+  width: 125px;
+
+  &:hover {
+    background-color: white;
+    color: $mainColor;
+    border: 2px solid $mainColor;
+  }
+
+  &:focus {
+    background-color: white;
+    color: $mainColor;
+    border: 2px solid $mainColor;
+  }
+}
+
+.button1{
+    background-color: white;
+    color: black;
+    border: 2px solid black;
+    border-radius: 50px;
+  
+    &:hover {
+      background-color: white;
+      color: $mainColor;
+      border: 2px solid $mainColor;
+    }
+  
+    &:focus {
+      background-color: white;
+      color: $mainColor;
+      border: 2px solid $mainColor;
+    }
+}
+
+.header {
+  background-color: white;
+}
+
+.text {
+  color: $mainColor;
+  font-weight: 900;
+}
+
+.inputfield {
+  border-color: $borderColor !important;
+  border-radius: 5px !important;
+  &:focus {
+    border-color: $mainColor !important;
+    --box-shadow-color: $mainColor !important; 
+    box-shadow: 1px 2px 5px var(--box-shadow-color) !important;
+  }
+
+  &:hover {
+    border-color: $mainColor !important;
+  }
+}
+
+.searchinputfield{
+    border-color: $borderColor !important;
+  border-radius: 50px !important;
+  &:focus {
+    border-color: $mainColor !important;
+  }
+   box-shadow: none;
+
+  &:hover {
+    border-color: $mainColor !important;
+  }
+
+  .searchinputfieldbutton{
+      color:$mainColor !important
+  }
+}
+
+.menuitemparent {
+  &:hover::after {
+    border-bottom-color: $mainColor !important;
+  }
+}
+
+.ant-menu-horizontal:not(.ant-menu-dark) > .ant-menu-item-selected::after {
+  border-bottom: 2px solid $mainColor;
+}
+
+.menuitem {
+  color: black !important;
+
+  &:focus {
+    color: $mainColor !important;
+  }
+
+  &:hover {
+    color: black !important;
+  }
+}
+
+.homeIcon {
+  color: $mainColor;
+  font-size: 45px;
+  margin-right: 10px;
+}
+
+.borderColor {
+  border-color: #dee2e6;
+}
+
+.pricingFormParent {
+  background-color: $mainColor;
+}
+
+.pricingForm {
+  background-color: $mainSubColor;
+}
+
+.ant-select:not(.ant-select-customize-input) .ant-select-selector {
+  border-color: $borderColor;
+  padding: 10px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  border-radius: 5px;
+  &:active {
+    border-color: $mainColor;
+    --box-shadow-color: $mainColor;
+    box-shadow: 1px 2px 5px var(--box-shadow-color);
+  }
+
+  &:hover {
+    border-color: $mainColor;
+  }
+}
+
+.contactus {
+  font-size: 18px;
+  background-color: $mainSubColor;
+  border-radius: 50%;
+  padding: 14px;
+}
+
+.ant-card-actions {
+  background-color: white;
+  border: 2px solid $mainColor;
+  border-radius: 10px;
+
+  .cardtext {
+    color: #6534da;
+    font-weight: 900;
+    padding: 15px 37px;
+  }
+
+  &:hover {
+    background-color: $mainColor;
+    .cardtext {
+      color: white;
+    }
+  }
+}
+
+.coursecontentdata {
+  color: black;
+
+  &:hover {
+    color: $mainColor;
+  }
+}
+
+.coursecontentdatadelete {
+  color: black;
+
+  &:hover {
+    color: $mainColor;
+    border-color: $mainColor;
+  }
+
+  &:focus {
+    color: black;
+    border-color: #d9d9d9;
+  }
+}
+
+.categoryImage{
+    padding: 15px;
+    transition: transform .2s;
+    &:hover{
+        transform: scale(1.1);
+    }
+}
+
+.categoryText{
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+
+    &:hover{
+        color: $mainColor;
+    }
+}
+
+.ant-card-body {
+     padding: 5px 0px; 
+}
+
+.coursCard{
+    overflow: hidden !important;
+    &:hover{
+        .coursCardImage{
+            transform: scale(1.1) !important;
+        }
+    }
+    .coursCardImage{
+        transition: transform .5s ease !important;
+    }
+}
+
+.cardItemTitle{
+    padding: 2px 0px; 
+    font-weight: bold;
+    cursor: pointer;
+
+    &:hover{
+        color: $mainColor;
+    }
+}
+
+.anticon svg:hover{
+    color:$mainColor !important;
+    border-color: $mainColor !important;
+}
+
+.bold_text{
+  font-weight: bold;
+}
+
+.text_center{
+  text-align: center;
+}
