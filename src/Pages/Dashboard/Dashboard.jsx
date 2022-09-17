@@ -20,26 +20,15 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../components/Auth";
 import { postRequest } from "../../api";
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
-import { useSelector } from "react-redux";
-import { selectAuthToken } from "../../features/authTokenSlice";
-
-const { Meta } = Card;
 const { Title } = Typography;
 const { Option } = Select;
 
-function getBase64(img, callback) {
-  const reader = new FileReader();
-  reader.addEventListener("load", () => callback(reader.result));
-  reader.readAsDataURL(img);
-}
 
 function Dashboard() {
   const navigate = useNavigate();
   const location = useLocation();
   const auth = useAuth();
-  const [fileList, setFileList] = useState(null);
   const [categories, setCategories] = useState([]);
-  const [editForm, setEditForm] = useState({});
 
   const user = localStorage.getItem("user")
     ? JSON.parse(localStorage.getItem("user"))
