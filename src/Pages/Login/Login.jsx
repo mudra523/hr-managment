@@ -30,7 +30,7 @@ function Login() {
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
-      navigate("/category");
+      navigate("/dashboard");
     }
   }, []);
 
@@ -39,8 +39,12 @@ function Login() {
       <Row justify="center" className="login_layout">
         <Col xs={24} sm={24} md={8} lg={8} xl={6} className="login_box">
           <div className="login_header">
-            <div className="bold_text "><h2>Welcome Back!</h2></div>
-            <div ><p>Login to continue</p></div>
+            <div className="bold_text ">
+              <h2>Welcome Back!</h2>
+            </div>
+            <div>
+              <p>Login to continue</p>
+            </div>
           </div>
           <Form
             name="basic"

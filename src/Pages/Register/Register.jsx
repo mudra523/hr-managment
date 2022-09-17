@@ -7,7 +7,6 @@ import { postRequest } from "../../api";
 import { useAuth } from "../../components/Auth";
 import "./Register.scss";
 
-
 function Register() {
   const navigate = useNavigate();
   const auth = useAuth();

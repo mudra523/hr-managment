@@ -17,25 +17,25 @@ function App() {
             <Route
               path="/login"
               element={
-                //   <RequireAuth>
-                <Login />
-                //   </RequireAuth>
+                <RequireAuth>
+                  <Login />
+                </RequireAuth>
               }
             />
             <Route
               path="/register"
               element={
-                //   <RequireAuth>
-                <Register />
-                //   </RequireAuth>
+                <RequireAuth>
+                  <Register />
+                </RequireAuth>
               }
             />
             <Route
               path="/dashboard"
               element={
-                // <RequireAuth>
+                <RequireAuth>
                   <Dashboard />
-                // </RequireAuth>
+                </RequireAuth>
               }
             />
             <Route path="*" element={<PageNotFound />} />

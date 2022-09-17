@@ -5,7 +5,7 @@ const { Footer: Foot } = Layout;
 function Footer() {
   return (
     <Foot style={{ textAlign: "center" }}>
-      React-Antd Design {new Date().getFullYear()} Created by Vishwaas
+      Hr Management {new Date().getFullYear()} Created by Vaibhav
     </Foot>
   );
 }
