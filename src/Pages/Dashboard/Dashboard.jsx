@@ -8,7 +8,6 @@ import {
   Typography,
   Form,
   Input,
-  Checkbox,
   DatePicker,
   InputNumber,
   Select,
@@ -20,6 +19,7 @@ import { getRequest } from "../../api";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../components/Auth";
 import { postRequest } from "../../api";
+import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { useSelector } from "react-redux";
 import { selectAuthToken } from "../../features/authTokenSlice";
 
@@ -141,7 +141,45 @@ function Dashboard() {
       onFilter: (value, record) => record.address.startsWith(value),
       filterSearch: true,
     },
-  ];
+    {
+      title: "City",
+      dataIndex: "city",
+      filters: [
+        {
+          text: "London",
+          value: "London",
+        },
+        {
+          text: "New York",
+          value: "New York",
+        },
+      ],
+      onFilter: (value, record) => record.address.startsWith(value),
+      filterSearch: true,
+    },
+    {
+      title: 'action',
+      dataIndex: 'Action',
+      render: (_, record) => {
+        return  (
+          <span>
+            <Typography.Link
+              onClick={showModal}
+              style={{
+                marginRight: 8,
+              }}
+            >
+              <EditOutlined />
+            </Typography.Link>
+            <Typography.Link
+            >
+              <DeleteOutlined />
+            </Typography.Link>
+          </span>
+        );
+      },
+    }
+    ];
   const data = [
     {
       key: "1",
