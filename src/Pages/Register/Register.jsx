@@ -47,7 +47,7 @@ function Register() {
   return (
     <Layout>
       <Row justify="center" className="reg_layout">
-        <Col xs={24} sm={24} md={8} lg={8} xl={6} className="reg_box">
+        <Col xs={24} sm={24} md={18} lg={12} xl={12} className="reg_box">
           <div className="reg_header">
             <div className="bold_text ">
               <h2>Welcome!</h2>
@@ -66,96 +66,110 @@ function Register() {
             className="reg_form"
             validateMessages={validateMessages}
           >
-            <Form.Item
-              name="fullname"
-              rules={[
-                {
-                  required: true,
-                  message: "Please input your fullname!",
-                },
-              ]}
+            <Row
+              gutter={{
+                xs: 8,
+                sm: 16,
+                md: 24,
+                lg: 32,
+              }}
             >
-              <Input
-                className="inputfield"
-                style={{ padding: "10px" }}
-                placeholder="Enter Fullname"
-              />
-            </Form.Item>
-            {/* <Form.Item
-              name="firstname"
-              rules={[
-                {
-                  required: true,
-                  message: "Please input your firstname!",
-                },
-              ]}
-            >
-              <Input
-                className="inputfield"
-                style={{ padding: "10px" }}
-                placeholder="Enter FirstName"
-              />
-            </Form.Item>
-            <Form.Item
-              name="lastname"
-              rules={[
-                {
-                  required: true,
-                  message: "Please input your lastname!",
-                },
-              ]}
-            >
-              <Input
-                className="inputfield"
-                style={{ padding: "10px" }}
-                placeholder="Enter LastName"
-              />
-            </Form.Item> */}
-            <Form.Item
-              name="username"
-              rules={[
-                { required: true, message: "Please input your username!" },
-              ]}
-            >
-              <Input
-                className="inputfield"
-                style={{ padding: "10px" }}
-                placeholder="Enter UserName"
-              />
-            </Form.Item>
-
-            <Form.Item
-              name="email"
-              rules={[
-                { required: true, message: "Please input your email!" },
-                { type: "email" },
-              ]}
-            >
-              <Input
-                className="inputfield"
-                style={{ padding: "10px" }}
-                placeholder="Enter Email"
-              />
-            </Form.Item>
-
-            <Form.Item
-              name="password"
-              rules={[
-                { required: true, message: "Please input your password!" },
-              ]}
-            >
-              <Input
-                type="password"
-                className="inputfield"
-                style={{ padding: "10px" }}
-                placeholder="Enter Password"
-              />
-            </Form.Item>
-
+              <Col xs={24} sm={24} md={12} lg={12} xl={12}>
+                <Form.Item
+                  name="firstname"
+                  rules={[
+                    {
+                      required: true,
+                      message: "Please input your firstname!",
+                    },
+                  ]}
+                >
+                  <Input
+                    className="inputfield"
+                    style={{ padding: "10px" }}
+                    placeholder="Enter Firstname"
+                  />
+                </Form.Item>
+              </Col>
+              <Col xs={24} sm={24} md={12} lg={12} xl={12}>
+                <Form.Item
+                  name="lastname"
+                  rules={[
+                    {
+                      required: true,
+                      message: "Please input your lastname!",
+                    },
+                  ]}
+                >
+                  <Input
+                    className="inputfield"
+                    style={{ padding: "10px" }}
+                    placeholder="Enter Lastname"
+                  />
+                </Form.Item>
+              </Col>
+              <Col xs={24} sm={24} md={12} lg={12} xl={12}>
+                <Form.Item
+                  name="email"
+                  rules={[
+                    { required: true, message: "Please input your email!" },
+                    { type: "email" },
+                  ]}
+                >
+                  <Input
+                    className="inputfield"
+                    style={{ padding: "10px" }}
+                    placeholder="Enter Email"
+                  />
+                </Form.Item>
+              </Col>
+              <Col xs={24} sm={24} md={12} lg={12} xl={12}>
+                <Form.Item
+                  name="mobile"
+                  rules={[
+                    { required: true, message: "Please input your mobile number!" },
+                  ]}
+                >
+                  <Input
+                    className="inputfield"
+                    style={{ padding: "10px" }}
+                    placeholder="Enter Mobile"
+                  />
+                </Form.Item>
+              </Col>
+              <Col xs={24} sm={24} md={12} lg={12} xl={12}>
+                <Form.Item
+                  name="username"
+                  rules={[
+                    { required: true, message: "Please input your username!" },
+                  ]}
+                >
+                  <Input
+                    className="inputfield"
+                    style={{ padding: "10px" }}
+                    placeholder="Enter UserName"
+                  />
+                </Form.Item>
+              </Col>
+              <Col xs={24} sm={24} md={12} lg={12} xl={12}>
+                <Form.Item
+                  name="password"
+                  rules={[
+                    { required: true, message: "Please input your password!" },
+                  ]}
+                >
+                  <Input
+                    type="password"
+                    className="inputfield"
+                    style={{ padding: "10px" }}
+                    placeholder="Enter Password"
+                  />
+                </Form.Item>
+              </Col>
+            </Row>
             <Form.Item name="remember" valuePropName="checked">
               <Checkbox>Remember me</Checkbox>
             </Form.Item>
-
             <Form.Item>
               <Button
                 style={{
