@@ -31,14 +31,14 @@ const { Option } = Select;
 function Dashboard() {
   const navigate = useNavigate();
   const location = useLocation();
-  const formRef = useRef(null);
-  const auth = useAuth();
+//   const formRef = useRef(null);
+//   const auth = useAuth();
   const [candidates, setCandidates] = useState([]);
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
   const [editID, setEditID] = useState(null);
   const [editData, setEditData] = useState([]);
-  console.log("editData", editData);
+  
   const columns = [
     {
       title: "Fullname",
@@ -183,7 +183,6 @@ function Dashboard() {
 
   const redirectPath = location.state?.path || "/dashboard";
   const onFinish = async (values) => {
-    console.log("OOOO", values);
     let candidateData = new FormData();
     candidateData.append("fullname", values?.fullname || "");
     candidateData.append("dob", values?.dob || "");
@@ -315,7 +314,7 @@ function Dashboard() {
             fullname: editData?.fullname,
             dob: moment(editData?.dob),
             technology: editData?.technology,
-            relevantPosition: editData?.relevantPosition,
+            relevantPosition: editData?.relevantPosition||null,
             yearsOfExperience: editData?.yearsOfExperience,
             currentCtc: editData?.currentCtc,
             expectedCtc: editData?.expectedCtc,
@@ -406,6 +405,7 @@ function Dashboard() {
                 ]}
               >
                 <Select
+                showSearch
                   placeholder="Select Relevant Position"
                   defaultValue={editData?.relevantPosition || ""}
                 >
