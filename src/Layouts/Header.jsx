@@ -71,7 +71,7 @@ function Header() {
               className="button"
               type="primary"
               icon={<LogoutOutlined />}
-              onClick={handleLogout}
+              onClick={() => handleLogout()}
             >
               LogOut
             </Button>
