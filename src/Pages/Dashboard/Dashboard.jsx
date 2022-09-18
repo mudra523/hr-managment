@@ -11,6 +11,7 @@ import {
   InputNumber,
   Select,
   Upload,
+  Tag,
 } from "antd";
 import React, { useEffect, useState, useRef } from "react";
 import Layout from "../../Layouts/index";
@@ -68,7 +69,17 @@ function Dashboard() {
     {
       title: "Technology",
       dataIndex: "technology",
-      render: (_, record) => <div>{record?.technology}</div>,
+      render: (_, record) => (
+        <div>
+          {record?.technology.map((tech) => {
+            return (
+              <Tag color="blue" style={{ marginBottom: "5px" }}>
+                {tech}
+              </Tag>
+            );
+          })}
+        </div>
+      ),
     },
     {
       title: "Experience",

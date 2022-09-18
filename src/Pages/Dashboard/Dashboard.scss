@@ -1,25 +1,6 @@
-.cd_layout {
-    height: 80vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-  
-  .cd_form {
-    display: "flex";
-    justify-content: "center";
-    flex-direction: "column";
-    margin-top: "35px";
-  }
-  
-  .cd_box {
-    padding: 2em;
-    background-color: #fff;
-  }
-  
-  .cd_header {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-  }
-  
+.cd_form {
+  display: "flex";
+  justify-content: "center";
+  flex-direction: "column";
+  margin-top: "35px";
+}
