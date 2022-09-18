@@ -12,8 +12,9 @@ function Register() {
   const auth = useAuth();
   const location = useLocation();
 
-  const redirectPath = location.state?.path || "/category";
+  const redirectPath = location.state?.path || "/dashboard";
   const onFinish = async (values) => {
+    console.log(values);
     await postRequest("register", values).then(({ data }) => {
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(data.user));
@@ -29,7 +30,7 @@ function Register() {
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
-      navigate("/category");
+      navigate("/dashboard");
     }
   }, []);
 
@@ -125,9 +126,12 @@ function Register() {
               </Col>
               <Col xs={24} sm={24} md={12} lg={12} xl={12}>
                 <Form.Item
-                  name="mobile"
+                  name="phonenumber"
                   rules={[
-                    { required: true, message: "Please input your mobile number!" },
+                    {
+                      required: true,
+                      message: "Please input your mobile number!",
+                    },
                   ]}
                 >
                   <Input
@@ -185,7 +189,7 @@ function Register() {
             </Form.Item>
             <div className="reg_footer">
               Already have an account?&nbsp;&nbsp;
-              <Link to="/login" className="text">
+              <Link to="/" className="text">
                 Login
               </Link>
             </div>

@@ -1,6 +1,5 @@
 import {
   Table,
-  Card,
   Col,
   Button,
   Modal,
@@ -19,67 +18,28 @@ import { getRequest } from "../../api";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../components/Auth";
 import { postRequest } from "../../api";
-import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
+import {
+  EditOutlined,
+  DeleteOutlined,
+  SearchOutlined,
+  DownloadOutlined,
+} from "@ant-design/icons";
 const { Title } = Typography;
 const { Option } = Select;
+const { Search } = Input;
 
 function Dashboard() {
   const navigate = useNavigate();
   const location = useLocation();
   const auth = useAuth();
-  const [categories, setCategories] = useState([]);
-
-  const user = localStorage.getItem("user")
-    ? JSON.parse(localStorage.getItem("user"))
-    : "";
-
-  useEffect(() => {
-    getRequest("categories").then(({ data }) => {
-      setCategories(data);
-    });
-  }, []);
-
+  const [candidates, setCandidates] = useState([]);
+  const [page, setPage] = useState(1);
+  const [total, setTotal] = useState(0);
   const columns = [
     {
-      title: "Name",
-      dataIndex: "name",
-      filters: [
-        {
-          text: "Joe",
-          value: "Joe",
-        },
-        {
-          text: "Category 1",
-          value: "Category 1",
-          children: [
-            {
-              text: "Yellow",
-              value: "Yellow",
-            },
-            {
-              text: "Pink",
-              value: "Pink",
-            },
-          ],
-        },
-        {
-          text: "Category 2",
-          value: "Category 2",
-          children: [
-            {
-              text: "Green",
-              value: "Green",
-            },
-            {
-              text: "Black",
-              value: "Black",
-            },
-          ],
-        },
-      ],
-      filterMode: "tree",
-      filterSearch: true,
-      onFilter: (value, record) => record.name.includes(value),
+      title: "Fullname",
+      dataIndex: "fullname",
+      sorter: (a, b) => a.fullname - b.fullname,
     },
     {
       title: "DOB",
@@ -88,7 +48,8 @@ function Dashboard() {
     },
     {
       title: "Position",
-      dataIndex: "position",
+      dataIndex: "relevantPosition",
+      sorter: (a, b) => a.relevantPosition - b.relevantPosition,
     },
     {
       title: "Technology",
@@ -96,58 +57,45 @@ function Dashboard() {
     },
     {
       title: "Experience",
-      dataIndex: "experience",
-      sorter: (a, b) => a.experience - b.experience,
+      dataIndex: "yearsOfExperience",
+      sorter: (a, b) => a.yearsOfExperience - b.yearsOfExperience,
     },
     {
-      title: "CTC",
-      dataIndex: "ctc",
-      sorter: (a, b) => a.ctc - b.ctc,
+      title: "Current CTC",
+      dataIndex: "currentCtc",
+      sorter: (a, b) => a.currentCtc - b.currentCtc,
     },
     {
       title: "Expected CTC",
-      dataIndex: "ectc",
-      sorter: (a, b) => a.ectc - b.ectc,
+      dataIndex: "expectedCtc",
+      sorter: (a, b) => a.expectedCtc - b.expectedCtc,
+    },
+    {
+      title: "City",
+      dataIndex: "currentCity",
+      filterSearch: true,
     },
     {
       title: "Download CV",
-      dataIndex: "cv",
+      dataIndex: "cvUrl",
+      render: (_, record) => {
+        return (
+          <span style={{ display: "flex", justifyContent: "center" }}>
+            <Typography.Link
+              onClick={showModal}
+              style={{
+                marginRight: 8,
+              }}
+            >
+              <DownloadOutlined />
+            </Typography.Link>
+          </span>
+        );
+      },
     },
     {
-      title: "City",
-      dataIndex: "city",
-      filters: [
-        {
-          text: "London",
-          value: "London",
-        },
-        {
-          text: "New York",
-          value: "New York",
-        },
-      ],
-      onFilter: (value, record) => record.address.startsWith(value),
-      filterSearch: true,
-    },
-    {
-      title: "City",
-      dataIndex: "city",
-      filters: [
-        {
-          text: "London",
-          value: "London",
-        },
-        {
-          text: "New York",
-          value: "New York",
-        },
-      ],
-      onFilter: (value, record) => record.address.startsWith(value),
-      filterSearch: true,
-    },
-    {
-      title: "action",
-      dataIndex: "Action",
+      title: "Action",
+      dataIndex: "action",
       render: (_, record) => {
         return (
           <span>
@@ -157,6 +105,7 @@ function Dashboard() {
                 marginRight: 8,
               }}
             >
+              {console.log(record, "record")}
               <EditOutlined />
             </Typography.Link>
             <Typography.Link>
@@ -167,71 +116,56 @@ function Dashboard() {
       },
     },
   ];
-  const data = [
-    {
-      key: "1",
-      name: "John Brown",
-      dob: "",
-      position: "",
-      technology: "",
-      experience: "",
-      ctc: "",
-      ectc: "",
-      cv: "",
-      city: "New York",
-    },
-    {
-      key: "2",
-      name: "Jim Green",
-      dob: "",
-      position: "",
-      technology: "",
-      experience: "",
-      ctc: "",
-      ectc: "",
-      cv: "",
-      city: "London",
-    },
-  ];
-  const onChange = (pagination, filters, sorter, extra) => {
-    console.log("params", pagination, filters, sorter, extra);
+
+  const onChange = async (pagination, filters, sorter, extra) => {
+    await getRequest(`candidates?key=&page=${pagination.current}`).then(
+      ({ data }) => {
+        setCandidates(data[0].data);
+        setPage(data[0].metadata[0].page);
+        setTotal(data[0].metadata[0].total);
+      }
+    );
   };
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [positions, setPositions] = useState([]);
 
-  const showModal = () => {
-    console.log("modal");
+  const showModal = (value) => {
     setIsModalOpen(true);
   };
 
   const handleOk = () => {
-    console.log("ok");
     setIsModalOpen(false);
   };
 
   const handleCancel = () => {
-    console.log("cancel");
     setIsModalOpen(false);
   };
 
   const redirectPath = location.state?.path || "/dashboard";
   const onFinish = async (values) => {
-    await postRequest("register", values).then(({ data }) => {
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("user", JSON.stringify(data.user));
-      auth.login(data.token);
+    console.log(values);
+    await postRequest("candidate/add", values).then(({ data }) => {
+      setIsModalOpen(false);
+      setCandidates((candidates) => [...candidates, data.candidate]);
       navigate(redirectPath, { replace: true });
     });
+    console.log(candidates.length);
   };
 
   const onFinishFailed = (errorInfo) => {
     console.log("Failed:", errorInfo);
   };
 
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      navigate("/dashboard");
-    }
+  useEffect(async () => {
+    await getRequest(`candidates?key=&page=${page}`).then(({ data }) => {
+      setCandidates(data[0].data);
+      setPage(data[0].metadata[0].page);
+      setTotal(data[0].metadata[0].total);
+    });
+
+    await getRequest("positions").then(({ data }) => {
+      setPositions(data);
+    });
   }, []);
 
   const validateMessages = {
@@ -247,15 +181,30 @@ function Dashboard() {
   const handleChange = (value) => {
     console.log(`selected ${value}`);
   };
+  const onSearch = (value) => console.log(value);
 
   return (
     <>
       <Layout>
         <Row style={{ marginTop: "2em" }} justify="center">
           <Col xs={24} sm={24} md={22} lg={20} xl={20}>
-            <Row style={{ marginBottom: "2em" }} justify="space-between">
+            <Row
+              style={{ marginBottom: "2em" }}
+              justify="space-between"
+              align="center"
+            >
               <Col>
                 <Title level={2}>Candidate Data</Title>
+              </Col>
+              <Col style={{ display: "flex", alignItems: "center" }}>
+                <Input
+                  size="large"
+                  className="inputfield"
+                  style={{ width: 400, padding: "10px" }}
+                  placeholder="Serch Candidate..."
+                  onSearch={onSearch}
+                  suffix={<SearchOutlined />}
+                />
               </Col>
               <Col>
                 <Button className="button" onClick={showModal}>
@@ -263,7 +212,16 @@ function Dashboard() {
                 </Button>
               </Col>
             </Row>
-            <Table columns={columns} dataSource={data} onChange={onChange} />
+            <Table
+              columns={columns}
+              dataSource={candidates}
+              onChange={onChange}
+              pagination={{
+                total: total,
+                current: page,
+                pageSize: 10,
+              }}
+            />
           </Col>
         </Row>
       </Layout>
@@ -305,12 +263,13 @@ function Dashboard() {
                   className="inputfield"
                   style={{ padding: "10px" }}
                   placeholder="Enter Fullname"
+                  value={}
                 />
               </Form.Item>
             </Col>
             <Col xs={24} sm={24} md={12} lg={12} xl={12}>
               <Form.Item
-                name="Date Of Birth"
+                name="dob"
                 rules={[
                   {
                     required: true,
@@ -321,6 +280,7 @@ function Dashboard() {
                 <DatePicker
                   className="inputfield"
                   style={{ padding: "10px", width: "100%" }}
+                  format={"YYYY-MM-DD"}
                 />
               </Form.Item>
             </Col>
@@ -342,16 +302,16 @@ function Dashboard() {
                   placeholder="Enter Technology"
                   onChange={handleChange}
                 >
-                  <Option key="1">Node JS</Option>
-                  <Option key="2">Nest JS</Option>
-                  <Option key="3">React</Option>
-                  <Option key="4">AWS</Option>
+                  <Option key="Node JS">Node JS</Option>
+                  <Option key="Nest JS">Nest JS</Option>
+                  <Option key="React">React</Option>
+                  <Option key="AWS">AWS</Option>
                 </Select>
               </Form.Item>
             </Col>
             <Col xs={24} sm={24} md={12} lg={12} xl={12}>
               <Form.Item
-                name="position"
+                name="relevantPosition"
                 rules={[
                   {
                     required: true,
@@ -360,15 +320,19 @@ function Dashboard() {
                 ]}
               >
                 <Select placeholder="Select Relevant Position">
-                  <Select.Option value="demo">Demo</Select.Option>
-                  <Select.Option value="demo">Demo</Select.Option>
-                  <Select.Option value="demo">Demo</Select.Option>
+                  {positions.map((position) => {
+                    return (
+                      <Select.Option value={position._id}>
+                        {position.name}
+                      </Select.Option>
+                    );
+                  })}
                 </Select>
               </Form.Item>
             </Col>
             <Col xs={24} sm={24} md={12} lg={12} xl={12}>
               <Form.Item
-                name="experience"
+                name="yearsOfExperience"
                 rules={[
                   {
                     required: true,
@@ -385,7 +349,7 @@ function Dashboard() {
             </Col>
             <Col xs={24} sm={24} md={12} lg={12} xl={12}>
               <Form.Item
-                name="ctc"
+                name="currentCtc"
                 rules={[{ required: true, message: "Please enter CTC!" }]}
               >
                 <Input
@@ -397,7 +361,7 @@ function Dashboard() {
             </Col>
             <Col xs={24} sm={24} md={12} lg={12} xl={12}>
               <Form.Item
-                name="ectc"
+                name="expectedCtc"
                 rules={[
                   { required: true, message: "Please enter Expected CTC!" },
                 ]}
@@ -411,7 +375,7 @@ function Dashboard() {
             </Col>
             <Col xs={24} sm={24} md={12} lg={12} xl={12}>
               <Form.Item
-                name="city"
+                name="currentCity"
                 rules={[
                   { required: true, message: "Please enter Current City!" },
                 ]}
@@ -425,7 +389,7 @@ function Dashboard() {
             </Col>
             <Col xs={24} sm={24} md={12} lg={12} xl={12}>
               <Form.Item
-                name="upload"
+                name="cvUrl"
                 rules={[{ required: true, message: "Please Upload CV!" }]}
               >
                 <Upload

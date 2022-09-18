@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { Badge, Button, Menu } from "antd";
 import { Link, useNavigate } from "react-router-dom";
 import { LoginOutlined, LogoutOutlined } from "@ant-design/icons";
-import { ShoppingCartOutlined } from "@ant-design/icons";
 import { getRequest } from "../api";
 import { useAuth } from "../components/Auth";
 import { useDispatch } from "react-redux";
@@ -12,20 +11,12 @@ const { Item } = Menu;
 function Header() {
   const [path, setPath] = useState("/");
 
-  const [cart, setCart] = useState([]);
   const auth = useAuth();
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const user = localStorage.getItem("user");
-
   useEffect(() => {
     setPath(window.location.pathname);
-    if (user) {
-      getRequest("carts/").then(({ data }) => {
-        setCart(data);
-      });
-    }
   }, []);
 
   const handleLogout = async () => {
@@ -55,6 +46,7 @@ function Header() {
           style={{
             width: "100%",
             justifyContent: "end",
+            border: "none",
           }}
           className="header"
         >
@@ -86,7 +78,7 @@ function Header() {
           </>
         ) : (
           <>
-            <Link to="/login">
+            <Link to="/">
               <Button
                 className="button"
                 style={{

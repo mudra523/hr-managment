@@ -14,22 +14,7 @@ function App() {
         <BrowserRouter>
           <Routes>
             <Route index path="/" element={<Login />} />
-            <Route
-              path="/login"
-              element={
-                <RequireAuth>
-                  <Login />
-                </RequireAuth>
-              }
-            />
-            <Route
-              path="/register"
-              element={
-                <RequireAuth>
-                  <Register />
-                </RequireAuth>
-              }
-            />
+            <Route path="/register" element={<Register />} />
             <Route
               path="/dashboard"
               element={

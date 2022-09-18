@@ -14,7 +14,7 @@ function Login() {
   const location = useLocation();
   const dispatch = useDispatch();
 
-  const redirectPath = location.state?.path || "/category";
+  const redirectPath = location.state?.path || "/dashboard";
   const onFinish = async (values) => {
     await postRequest("login", values).then(({ data }) => {
       auth.login(data.token);
