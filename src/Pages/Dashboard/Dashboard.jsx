@@ -14,8 +14,8 @@ import {
 } from "antd";
 import React, { useEffect, useState, useRef } from "react";
 import Layout from "../../Layouts/index";
-import { getRequest } from "../../api";
-import { useNavigate, useLocation } from "react-router-dom";
+import { deleteRequest, getRequest } from "../../api";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../components/Auth";
 import { postRequest } from "../../api";
 import {
@@ -86,14 +86,19 @@ function Dashboard() {
       render: (_, record) => {
         return (
           <span style={{ display: "flex", justifyContent: "center" }}>
-            <Typography.Link
-              onClick={showModal}
-              style={{
-                marginRight: 8,
-              }}
-            >
-              <DownloadOutlined />
-            </Typography.Link>
+            {record?.cvUrl ? (
+              <Typography.Link
+                style={{
+                  marginRight: 8,
+                }}
+                target="_blank"
+                href={"http://localhost:2325/" + record.cvUrl}
+              >
+                <DownloadOutlined />
+              </Typography.Link>
+            ) : (
+              "-"
+            )}
           </span>
         );
       },
@@ -112,7 +117,20 @@ function Dashboard() {
             >
               <EditOutlined />
             </Typography.Link>
-            <Typography.Link>
+            <Typography.Link
+              onClick={async () => {
+                await deleteRequest(`candidate/delete/${record._id}`).then(
+                  ({ data }) => {
+                    setCandidates((candidates) => {
+                      return candidates.filter(
+                        (candidate) => candidate._id != record._id
+                      );
+                    });
+                    navigate(redirectPath, { replace: true });
+                  }
+                );
+              }}
+            >
               <DeleteOutlined />
             </Typography.Link>
           </span>
@@ -120,6 +138,12 @@ function Dashboard() {
       },
     },
   ];
+
+  const dummyRequest = ({ onSuccess }) => {
+    setTimeout(() => {
+      onSuccess("ok");
+    }, 0);
+  };
 
   const onChange = async (pagination, filters, sorter, extra) => {
     await getRequest(`candidates?key=&page=${pagination.current}`).then(
@@ -154,6 +178,16 @@ function Dashboard() {
 
   const redirectPath = location.state?.path || "/dashboard";
   const onFinish = async (values) => {
+    let candidateData = new FormData();
+    candidateData.append("fullname", values.fullname);
+    candidateData.append("dob", values.dob);
+    candidateData.append("relevantPosition", values.relevantPosition);
+    candidateData.append("technology", values.technology);
+    candidateData.append("yearsOfExperience", values.yearsOfExperience);
+    candidateData.append("currentCity", values.currentCity);
+    candidateData.append("currentCtc", values.currentCtc);
+    candidateData.append("expectedCtc", values.expectedCtc);
+    candidateData.append("cvUrl", values?.cvUrl?.file?.originFileObj);
     editID
       ? await postRequest(`candidate/edit/${editID}`, values).then(
           ({ data }) => {
@@ -208,7 +242,14 @@ function Dashboard() {
   const handleChange = (value) => {
     console.log(`selected ${value}`);
   };
-  const onSearch = (value) => console.log(value);
+  const onSearch = async (e) => {
+    const value = e.target.value;
+    await getRequest(`candidates?key=${value}&page=1`).then(({ data }) => {
+      setCandidates(data[0].data);
+      setPage(data[0].metadata[0].page);
+      setTotal(data[0].metadata[0].total);
+    });
+  };
 
   return (
     <>
@@ -229,7 +270,7 @@ function Dashboard() {
                   className="inputfield"
                   style={{ width: 400, padding: "10px" }}
                   placeholder="Serch Candidate..."
-                  onSearch={onSearch}
+                  onChange={onSearch}
                   suffix={<SearchOutlined />}
                 />
               </Col>
@@ -360,9 +401,9 @@ function Dashboard() {
                   placeholder="Select Relevant Position"
                   defaultValue={editData?.relevantPosition|| ''}
                 >
-                  {positions.map((position) => {
+                  {positions.map((position, index) => {
                     return (
-                      <Select.Option value={position._id}>
+                      <Select.Option key={index} value={position._id}>
                         {position.name}
                       </Select.Option>
                     );
@@ -437,6 +478,7 @@ function Dashboard() {
                   action="/upload.do"
                   listType="picture"
                   style={{ padding: "10px", width: "100%" }}
+                  customRequest={dummyRequest}
                 >
                   <Button>Upload CV</Button>
                 </Upload>
