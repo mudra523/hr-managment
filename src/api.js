@@ -3,8 +3,7 @@ import { notification } from "antd";
 import store from "./app/store";
 const axiosClient = axios.create();
 
-axiosClient.defaults.baseURL =
-  "https://1215-2409-4041-e17-8127-5cda-13d-8b6b-f6b7.ngrok.io";
+axiosClient.defaults.baseURL = "http://localhost:2325";
 
 store.subscribe(listener);
 

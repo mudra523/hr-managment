@@ -33,8 +33,6 @@ const { Option } = Select;
 function Dashboard() {
   const navigate = useNavigate();
   const location = useLocation();
-  const formRef = useRef(null);
-  const auth = useAuth();
   const [candidates, setCandidates] = useState([]);
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
