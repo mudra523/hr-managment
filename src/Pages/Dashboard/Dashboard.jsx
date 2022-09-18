@@ -14,7 +14,7 @@ import {
 } from "antd";
 import React, { useEffect, useState, useRef } from "react";
 import Layout from "../../Layouts/index";
-import { deleteRequest, getRequest } from "../../api";
+import { deleteRequest, getRequest, putRequest } from "../../api";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../components/Auth";
 import { postRequest } from "../../api";
@@ -23,6 +23,7 @@ import {
   DeleteOutlined,
   SearchOutlined,
   DownloadOutlined,
+  UploadOutlined,
 } from "@ant-design/icons";
 import moment from "moment";
 const { Title } = Typography;
@@ -38,7 +39,12 @@ function Dashboard() {
   const [total, setTotal] = useState(0);
   const [editID, setEditID] = useState(null);
   const [editData, setEditData] = useState([]);
-  
+  const [searchData, setSearchData] = useState({
+    candidate: "",
+    position: "",
+    experience: "",
+  });
+
   const columns = [
     {
       title: "Fullname",
@@ -48,7 +54,9 @@ function Dashboard() {
     {
       title: "DOB",
       dataIndex: "dob",
-      render: (_, record) => <div>{moment(record?.dob).format("DD-MM-YYYY")}</div>,
+      render: (_, record) => (
+        <div>{moment(record?.dob).format("DD-MM-YYYY")}</div>
+      ),
       sorter: (a, b) => a.dob - b.dob,
     },
     {
@@ -148,20 +156,20 @@ function Dashboard() {
   };
 
   const onChange = async (pagination, filters, sorter, extra) => {
-    await getRequest(`candidates?key=&page=${pagination.current}`).then(
-      ({ data }) => {
-        setCandidates(data[0].data);
-        setPage(data[0].metadata[0].page);
-        setTotal(data[0].metadata[0].total);
-      }
-    );
+    await getRequest(
+      `candidates?candidate=&position=&experience=&page=${pagination.current}`
+    ).then(({ data }) => {
+      setCandidates(data[0].data);
+      setPage(data[0].metadata[0].page);
+      setTotal(data[0].metadata[0].total);
+    });
   };
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [positions, setPositions] = useState([]);
 
   const showModal = () => {
     setEditID(null);
-    setEditData(null)
+    setEditData(null);
     setIsModalOpen(true);
   };
 
@@ -181,19 +189,18 @@ function Dashboard() {
 
   const redirectPath = location.state?.path || "/dashboard";
   const onFinish = async (values) => {
-    let candidateData = new FormData();
-    candidateData.append("fullname", values?.fullname || '');
-    candidateData.append("dob", values?.dob || '');
-    candidateData.append("relevantPosition", values?.relevantPosition || '');
-    candidateData.append("technology", values?.technology || '');
-    candidateData.append("yearsOfExperience", values?.yearsOfExperience || '');
-    candidateData.append("currentCity", values?.currentCity || '');
-    candidateData.append("currentCtc", values?.currentCtc || '');
-    candidateData.append("expectedCtc", values?.expectedCtc || '');
-    candidateData.append("cvUrl", values?.cvUrl);
-    console.log("AA",values?.cvUrl?.file?.originFileObj)
+    const candidateData = new FormData();
+    candidateData.append("fullname", values?.fullname || "");
+    candidateData.append("dob", values?.dob || "");
+    candidateData.append("relevantPosition", values?.relevantPosition || "");
+    candidateData.append("technology", values?.technology || "");
+    candidateData.append("yearsOfExperience", values?.yearsOfExperience || "");
+    candidateData.append("currentCity", values?.currentCity || "");
+    candidateData.append("currentCtc", values?.currentCtc || "");
+    candidateData.append("expectedCtc", values?.expectedCtc || "");
+    candidateData.append("cvUrl", values?.cvUrl?.file?.originFileObj);
     editID
-      ? await postRequest(`candidate/edit/${editID}`, values).then(
+      ? await putRequest(`candidate/edit/${editID}`, candidateData).then(
           ({ data }) => {
             setIsModalOpen(false);
             setCandidates((candidates) =>
@@ -208,7 +215,7 @@ function Dashboard() {
             navigate(redirectPath, { replace: true });
           }
         )
-      : await postRequest(`candidate/add`, values).then(({ data }) => {
+      : await postRequest(`candidate/add`, candidateData).then(({ data }) => {
           setIsModalOpen(false);
           setCandidates((candidates) => [...candidates, data?.candidate]);
           navigate(redirectPath, { replace: true });
@@ -219,17 +226,21 @@ function Dashboard() {
     console.log("Failed:", errorInfo);
   };
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(async () => {
-    await getRequest(`candidates?key=&page=${page}`).then(({ data }) => {
-      setCandidates(data[0].data);
+  const defaultFunction = async () => {
+    await getRequest(
+      `candidates?candidate=&position=&experience=&page=${page}`
+    ).then(({ data }) => {
+      setCandidates(data[0]?.data);
       setPage(data[0]?.metadata[0]?.page);
       setTotal(data[0]?.metadata[0]?.total);
     });
-
     await getRequest("positions").then(({ data }) => {
       setPositions(data);
     });
+  };
+
+  useEffect(() => {
+    defaultFunction();
   }, []);
 
   const validateMessages = {
@@ -245,9 +256,17 @@ function Dashboard() {
   const handleChange = (value) => {
     console.log(`selected ${value}`);
   };
-  const onSearch = async (e) => {
-    const value = e.target.value;
-    await getRequest(`candidates?key=${value}&page=1`).then(({ data }) => {
+  const onSearch = async (candidate, position, experience) => {
+    console.log(candidate, position, experience);
+    setSearchData({
+      candidate,
+      position,
+      experience,
+    });
+
+    await getRequest(
+      `candidates?candidate=${candidate}&position=${position}&experience=${experience}&page=1`
+    ).then(({ data }) => {
       setCandidates(data[0].data);
       setPage(data[0].metadata[0].page);
       setTotal(data[0].metadata[0].total);
@@ -271,13 +290,51 @@ function Dashboard() {
                 <Input
                   size="large"
                   className="inputfield"
-                  style={{ width: 400, padding: "10px" }}
+                  style={{ width: 200, padding: "10px" }}
                   placeholder="Serch Candidate..."
-                  onChange={onSearch}
+                  onChange={(e) =>
+                    onSearch(
+                      e.target.value,
+                      searchData.position,
+                      searchData.experience
+                    )
+                  }
                   suffix={<SearchOutlined />}
                 />
               </Col>
-              <Col>
+              <Col style={{ display: "flex", alignItems: "center" }}>
+                <Input
+                  size="large"
+                  className="inputfield"
+                  style={{ width: 200, padding: "10px" }}
+                  placeholder="Serch Position..."
+                  onChange={(e) =>
+                    onSearch(
+                      searchData.candidate,
+                      e.target.value,
+                      searchData.experience
+                    )
+                  }
+                  suffix={<SearchOutlined />}
+                />
+              </Col>
+              <Col style={{ display: "flex", alignItems: "center" }}>
+                <Input
+                  size="large"
+                  className="inputfield"
+                  style={{ width: 200, padding: "10px" }}
+                  placeholder="Serch Experience..."
+                  onChange={(e) =>
+                    onSearch(
+                      searchData.candidate,
+                      searchData.position,
+                      e.target.value
+                    )
+                  }
+                  suffix={<SearchOutlined />}
+                />
+              </Col>
+              <Col style={{ display: "flex", alignItems: "center" }}>
                 <Button className="button" onClick={showModal}>
                   Add Data
                 </Button>
@@ -404,7 +461,7 @@ function Dashboard() {
               >
                 <Select
                   placeholder="Select Relevant Position"
-                  defaultValue={editData?.relevantPosition|| ''}
+                  defaultValue={editData?.relevantPosition || ""}
                 >
                   {positions.map((position, index) => {
                     return (
