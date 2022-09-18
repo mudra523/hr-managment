@@ -8,7 +8,7 @@ const { Content } = Layout;
 function index(props) {
   return (
     <Layout
-      style={{ display: "flex", height: "100vh", flexDirection: "column" }}
+      style={{ display: "flex", minHeight: "100vh", flexDirection: "column" }}
     >
       <div>
         <Header />

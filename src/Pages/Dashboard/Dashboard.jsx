@@ -38,7 +38,7 @@ function Dashboard() {
   const [total, setTotal] = useState(0);
   const [editID, setEditID] = useState(null);
   const [editData, setEditData] = useState([]);
-  console.log("candidates", candidates);
+  
   const columns = [
     {
       title: "Fullname",
@@ -48,6 +48,7 @@ function Dashboard() {
     {
       title: "DOB",
       dataIndex: "dob",
+      render: (_, record) => <div>{moment(record?.dob).format("DD-MM-YYYY")}</div>,
       sorter: (a, b) => a.dob - b.dob,
     },
     {
@@ -59,6 +60,7 @@ function Dashboard() {
     {
       title: "Technology",
       dataIndex: "technology",
+      render: (_, record) => <div>{record?.technology}</div>,
     },
     {
       title: "Experience",
@@ -159,6 +161,7 @@ function Dashboard() {
 
   const showModal = () => {
     setEditID(null);
+    setEditData(null)
     setIsModalOpen(true);
   };
 
@@ -179,15 +182,16 @@ function Dashboard() {
   const redirectPath = location.state?.path || "/dashboard";
   const onFinish = async (values) => {
     let candidateData = new FormData();
-    candidateData.append("fullname", values.fullname);
-    candidateData.append("dob", values.dob);
-    candidateData.append("relevantPosition", values.relevantPosition);
-    candidateData.append("technology", values.technology);
-    candidateData.append("yearsOfExperience", values.yearsOfExperience);
-    candidateData.append("currentCity", values.currentCity);
-    candidateData.append("currentCtc", values.currentCtc);
-    candidateData.append("expectedCtc", values.expectedCtc);
-    candidateData.append("cvUrl", values?.cvUrl?.file?.originFileObj);
+    candidateData.append("fullname", values?.fullname || '');
+    candidateData.append("dob", values?.dob || '');
+    candidateData.append("relevantPosition", values?.relevantPosition || '');
+    candidateData.append("technology", values?.technology || '');
+    candidateData.append("yearsOfExperience", values?.yearsOfExperience || '');
+    candidateData.append("currentCity", values?.currentCity || '');
+    candidateData.append("currentCtc", values?.currentCtc || '');
+    candidateData.append("expectedCtc", values?.expectedCtc || '');
+    candidateData.append("cvUrl", values?.cvUrl);
+    console.log("AA",values?.cvUrl?.file?.originFileObj)
     editID
       ? await postRequest(`candidate/edit/${editID}`, values).then(
           ({ data }) => {
@@ -209,7 +213,6 @@ function Dashboard() {
           setCandidates((candidates) => [...candidates, data?.candidate]);
           navigate(redirectPath, { replace: true });
         });
-    formRef.current.resetFields();
   };
 
   const onFinishFailed = (errorInfo) => {
@@ -220,8 +223,8 @@ function Dashboard() {
   useEffect(async () => {
     await getRequest(`candidates?key=&page=${page}`).then(({ data }) => {
       setCandidates(data[0].data);
-      setPage(data[0].metadata[0].page);
-      setTotal(data[0].metadata[0].total);
+      setPage(data[0]?.metadata[0]?.page);
+      setTotal(data[0]?.metadata[0]?.total);
     });
 
     await getRequest("positions").then(({ data }) => {
@@ -289,6 +292,7 @@ function Dashboard() {
                 current: page,
                 pageSize: 10,
               }}
+              scroll={{ x: true }}
             />
           </Col>
         </Row>
@@ -299,6 +303,7 @@ function Dashboard() {
         onOk={handleOk}
         onCancel={handleCancel}
         footer={null}
+        destroyOnClose={true}
       >
         <Form
           name="basic"
@@ -474,7 +479,7 @@ function Dashboard() {
                 rules={[{ required: true, message: "Please Upload CV!" }]}
               >
                 <Upload
-                  name="logo"
+                  name="cvUrl"
                   action="/upload.do"
                   listType="picture"
                   style={{ padding: "10px", width: "100%" }}
