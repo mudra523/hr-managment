@@ -38,7 +38,7 @@ function Dashboard() {
   const [total, setTotal] = useState(0);
   const [editID, setEditID] = useState(null);
   const [editData, setEditData] = useState([]);
-  
+  console.log("editData", editData);
   const columns = [
     {
       title: "Fullname",
@@ -48,7 +48,9 @@ function Dashboard() {
     {
       title: "DOB",
       dataIndex: "dob",
-      render: (_, record) => <div>{moment(record?.dob).format("DD-MM-YYYY")}</div>,
+      render: (_, record) => (
+        <div>{moment(record?.dob).format("DD-MM-YYYY")}</div>
+      ),
       sorter: (a, b) => a.dob - b.dob,
     },
     {
@@ -161,7 +163,7 @@ function Dashboard() {
 
   const showModal = () => {
     setEditID(null);
-    setEditData(null)
+    setEditData(null);
     setIsModalOpen(true);
   };
 
@@ -181,17 +183,18 @@ function Dashboard() {
 
   const redirectPath = location.state?.path || "/dashboard";
   const onFinish = async (values) => {
+    console.log("OOOO", values);
     let candidateData = new FormData();
-    candidateData.append("fullname", values?.fullname || '');
-    candidateData.append("dob", values?.dob || '');
-    candidateData.append("relevantPosition", values?.relevantPosition || '');
-    candidateData.append("technology", values?.technology || '');
-    candidateData.append("yearsOfExperience", values?.yearsOfExperience || '');
-    candidateData.append("currentCity", values?.currentCity || '');
-    candidateData.append("currentCtc", values?.currentCtc || '');
-    candidateData.append("expectedCtc", values?.expectedCtc || '');
+    candidateData.append("fullname", values?.fullname || "");
+    candidateData.append("dob", values?.dob || "");
+    candidateData.append("relevantPosition", values?.relevantPosition || "");
+    candidateData.append("technology", values?.technology || "");
+    candidateData.append("yearsOfExperience", values?.yearsOfExperience || "");
+    candidateData.append("currentCity", values?.currentCity || "");
+    candidateData.append("currentCtc", values?.currentCtc || "");
+    candidateData.append("expectedCtc", values?.expectedCtc || "");
     candidateData.append("cvUrl", values?.cvUrl);
-    console.log("AA",values?.cvUrl?.file?.originFileObj)
+
     editID
       ? await postRequest(`candidate/edit/${editID}`, values).then(
           ({ data }) => {
@@ -312,7 +315,7 @@ function Dashboard() {
             fullname: editData?.fullname,
             dob: moment(editData?.dob),
             technology: editData?.technology,
-            relevantPosition: editData?.position?._id,
+            relevantPosition: editData?.relevantPosition,
             yearsOfExperience: editData?.yearsOfExperience,
             currentCtc: editData?.currentCtc,
             expectedCtc: editData?.expectedCtc,
@@ -404,13 +407,13 @@ function Dashboard() {
               >
                 <Select
                   placeholder="Select Relevant Position"
-                  defaultValue={editData?.relevantPosition|| ''}
+                  defaultValue={editData?.relevantPosition || ""}
                 >
-                  {positions.map((position, index) => {
+                  {positions.map((position) => {
                     return (
-                      <Select.Option key={index} value={position._id}>
-                        {position.name}
-                      </Select.Option>
+                      <Option key={position?._id} value={position?._id}>
+                        {position?.name}
+                      </Option>
                     );
                   })}
                 </Select>
@@ -476,7 +479,12 @@ function Dashboard() {
             <Col xs={24} sm={24} md={12} lg={12} xl={12}>
               <Form.Item
                 name="cvUrl"
-                rules={[{ required: true, message: "Please Upload CV!" }]}
+                rules={[
+                  {
+                    required: editID ? false : true,
+                    message: "Please Upload CV!",
+                  },
+                ]}
               >
                 <Upload
                   name="cvUrl"
