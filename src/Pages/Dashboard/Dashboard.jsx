@@ -12,10 +12,10 @@ import {
   Select,
   Upload,
 } from "antd";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import Layout from "../../Layouts/index";
 import { getRequest } from "../../api";
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../components/Auth";
 import { postRequest } from "../../api";
 import {
@@ -24,17 +24,21 @@ import {
   SearchOutlined,
   DownloadOutlined,
 } from "@ant-design/icons";
+import moment from "moment";
 const { Title } = Typography;
 const { Option } = Select;
-const { Search } = Input;
 
 function Dashboard() {
   const navigate = useNavigate();
   const location = useLocation();
+  const formRef = useRef(null);
   const auth = useAuth();
   const [candidates, setCandidates] = useState([]);
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
+  const [editID, setEditID] = useState(null);
+  const [editData, setEditData] = useState([]);
+  console.log("candidates", candidates);
   const columns = [
     {
       title: "Fullname",
@@ -49,7 +53,8 @@ function Dashboard() {
     {
       title: "Position",
       dataIndex: "relevantPosition",
-      sorter: (a, b) => a.relevantPosition - b.relevantPosition,
+      render: (_, record) => <div>{record?.Position?.[0]?.name}</div>,
+      sorter: (a, b) => a?.Position?.[0]?.name - b?.position?.[0]?.name,
     },
     {
       title: "Technology",
@@ -100,12 +105,11 @@ function Dashboard() {
         return (
           <span>
             <Typography.Link
-              onClick={showModal}
+              onClick={() => editFormData(record?._id)}
               style={{
                 marginRight: 8,
               }}
             >
-              {console.log(record, "record")}
               <EditOutlined />
             </Typography.Link>
             <Typography.Link>
@@ -129,8 +133,15 @@ function Dashboard() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [positions, setPositions] = useState([]);
 
-  const showModal = (value) => {
+  const showModal = () => {
+    setEditID(null);
     setIsModalOpen(true);
+  };
+
+  const editFormData = (value) => {
+    setIsModalOpen(true);
+    setEditID(value);
+    setEditData(candidates?.find((c) => c._id === value));
   };
 
   const handleOk = () => {
@@ -143,19 +154,35 @@ function Dashboard() {
 
   const redirectPath = location.state?.path || "/dashboard";
   const onFinish = async (values) => {
-    console.log(values);
-    await postRequest("candidate/add", values).then(({ data }) => {
-      setIsModalOpen(false);
-      setCandidates((candidates) => [...candidates, data.candidate]);
-      navigate(redirectPath, { replace: true });
-    });
-    console.log(candidates.length);
+    editID
+      ? await postRequest(`candidate/edit/${editID}`, values).then(
+          ({ data }) => {
+            setIsModalOpen(false);
+            setCandidates((candidates) =>
+              candidates.map((candidate) => {
+                if (candidate._id === editID) {
+                  return data?.candidate;
+                } else {
+                  return candidate;
+                }
+              })
+            );
+            navigate(redirectPath, { replace: true });
+          }
+        )
+      : await postRequest(`candidate/add`, values).then(({ data }) => {
+          setIsModalOpen(false);
+          setCandidates((candidates) => [...candidates, data?.candidate]);
+          navigate(redirectPath, { replace: true });
+        });
+    formRef.current.resetFields();
   };
 
   const onFinishFailed = (errorInfo) => {
     console.log("Failed:", errorInfo);
   };
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(async () => {
     await getRequest(`candidates?key=&page=${page}`).then(({ data }) => {
       setCandidates(data[0].data);
@@ -234,7 +261,18 @@ function Dashboard() {
       >
         <Form
           name="basic"
-          initialValues={{ remember: true }}
+          initialValues={{
+            remember: true,
+            fullname: editData?.fullname,
+            dob: moment(editData?.dob),
+            technology: editData?.technology,
+            relevantPosition: editData?.position?._id,
+            yearsOfExperience: editData?.yearsOfExperience,
+            currentCtc: editData?.currentCtc,
+            expectedCtc: editData?.expectedCtc,
+            currentCity: editData?.currentCity,
+            cvUrl: editData?.cvUrl,
+          }}
           onFinish={onFinish}
           onFinishFailed={onFinishFailed}
           autoComplete="off"
@@ -263,7 +301,6 @@ function Dashboard() {
                   className="inputfield"
                   style={{ padding: "10px" }}
                   placeholder="Enter Fullname"
-                  value={}
                 />
               </Form.Item>
             </Col>
@@ -319,7 +356,10 @@ function Dashboard() {
                   },
                 ]}
               >
-                <Select placeholder="Select Relevant Position">
+                <Select
+                  placeholder="Select Relevant Position"
+                  defaultValue={editData?.relevantPosition|| ''}
+                >
                   {positions.map((position) => {
                     return (
                       <Select.Option value={position._id}>
